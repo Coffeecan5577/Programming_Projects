@@ -9,7 +9,7 @@ from langchain.vectorstores.chroma import Chroma
 
 CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
 
-DATA_PATH = "Training_Data"
+DATA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Training_Data"
 
 def main():
 
