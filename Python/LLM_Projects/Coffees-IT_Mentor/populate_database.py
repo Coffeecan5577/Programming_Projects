@@ -1,7 +1,8 @@
 import argparse
 import os
 import shutil
-from langchain.document_loaders.pdf import PyPDFDirectoryLoader
+from langchain_community.document_loaders import PyPDFDirectoryLoader
+from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.scheme.document import Document
 from get_embedding_function import get_embedding_function
@@ -28,8 +29,11 @@ def main():
 
 
 def load_documents():
-    document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    return document_loader.load()
+    pdf_document_loader = PyPDFDirectoryLoader(DATA_PATH)
+    return pdf_document_loader.load()
+
+    markdown_document_loader = UnstructuredMarkdownLoader(DATA_PATH)
+    return markdown_document_loader.load()
 
 
 def split_documents(documents: list[Document]):

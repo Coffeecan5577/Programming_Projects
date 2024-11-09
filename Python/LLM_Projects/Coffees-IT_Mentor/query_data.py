@@ -1,7 +1,8 @@
 import argparse
 from langchain.vectorstores.chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
-from langchain.community.llms.ollama import Ollama
+# from langchain.community.llms.ollama import Ollama
+from langchain_ollama import Ollama
 
 from get_embedding_function import get_embedding_function
 

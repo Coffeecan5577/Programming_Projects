@@ -3,4 +3,5 @@ langchain
 chromadb # Vector storage
 pytest
 boto3
-marko
+Unstructured (Langchain package required to parse Markdown files)
+langchain-ollama
