@@ -6,7 +6,7 @@ from langchain_ollama import Ollama
 
 from get_embedding_function import get_embedding_function
 
-CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
+CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/Chroma_Training_Database"
 
 PROMPT_TEMPLATE = """
 Answer the question based only on the following context:

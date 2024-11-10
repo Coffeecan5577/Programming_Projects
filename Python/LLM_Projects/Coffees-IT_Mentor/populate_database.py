@@ -4,19 +4,16 @@ import shutil
 import unstructured
 import langchain_unstructured
 import langchain_community
+import magic
+import nltk
 import chromadb
 from langchain_unstructured import UnstructuredLoader
-from langchain_community.document_loaders import (
-    DirectoryLoader,
-    UnstructuredMarkdownLoader,
-)
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from get_embedding_function import get_embedding_function
 from langchain_community.vectorstores import Chroma
 
-CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
-
+CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/Chroma_Training_Database"
 DATA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Training_Data"
 
 def main():
@@ -36,12 +33,6 @@ def main():
 
 
 def load_documents():
-    # pdf_document_loader = PyPDFDirectoryLoader(DATA_PATH)
-    # return pdf_document_loader.load()
-
-    # markdown_document_loader = UnstructuredMarkdownLoader(DATA_PATH)
-    # return markdown_document_loader.load()
-
     unstructured_loader = UnstructuredLoader(
     file_path=DATA_PATH,
     strategy="hi_res",
@@ -49,7 +40,7 @@ def load_documents():
     max_characters=1000000,
     include_orig_elements=False,
     )
-    return unstructured_loader.load()
+    return unstructured_loader.lazy_load()
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(

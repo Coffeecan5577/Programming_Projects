@@ -1,4 +1,4 @@
-*.pyc
-.DS_Store
-backup
+.env
+chroma_*
 chroma
+.DS_Store
