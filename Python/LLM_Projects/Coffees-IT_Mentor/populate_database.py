@@ -1,11 +1,19 @@
 import argparse
 import os
 import shutil
+import unstructured
+import langchain_unstructured
+import langchain_community
+import chromadb
 from langchain_unstructured import UnstructuredLoader
+from langchain_community.document_loaders import (
+    DirectoryLoader,
+    UnstructuredMarkdownLoader,
+)
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-from langchain.scheme.document import Document
+from langchain.schema.document import Document
 from get_embedding_function import get_embedding_function
-from langchain.vectorstores.chroma import Chroma
+from langchain_community.vectorstores import Chroma
 
 CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
 
