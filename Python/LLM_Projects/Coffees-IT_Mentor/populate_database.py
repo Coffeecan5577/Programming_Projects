@@ -40,7 +40,7 @@ def load_documents():
     max_characters=1000000,
     include_orig_elements=False,
     )
-    return unstructured_loader.lazy_load()
+    return unstructured_loader.load()
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
