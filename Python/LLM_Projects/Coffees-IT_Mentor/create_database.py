@@ -11,8 +11,9 @@ from langchain_chroma import Chroma
 
 
 # Define constants for paths
-CHROMA_PATH = "LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
+CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
 DATA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Training_Data/"
+# OBSIDIAN_META_EXCLUSION_PATH = "/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta"
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +33,7 @@ def print_directory(DATA_PATH):
 def load_documents():
     try:
         logger.info("Loading documents from %s", DATA_PATH)
-        loader = DirectoryLoader(DATA_PATH, glob="**/[!.]*", show_progress=True, use_multithreading=True, recursive=True)
+        loader = DirectoryLoader(DATA_PATH, glob="**/[!.]*", show_progress=True, use_multithreading=True, recursive=True, exclude="**/[/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.obsidian, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.trash ]*", )
         documents = loader.load()
         logger.info("Loaded %d documents:", len(documents))
         # print_documents(DATA_PATH)  # <--- Add this line
@@ -58,9 +59,9 @@ def split_text(documents):
         text_splitter = RecursiveCharacterTextSplitter(
             separators=["\n\n", "\n"],
             chunk_size=300,
-            chunk_overlap=50,  # Reduced overlap to make more efficient splits
+            chunk_overlap=10,  # Reduced overlap to make more efficient splits
             length_function=len,
-            add_start_index=True,
+            add_start_index=False,
         )
         chunks = text_splitter.split_documents(documents)
         logger.info(f"Split {len(documents)} documents into {len(chunks)} chunks.")
@@ -88,6 +89,8 @@ def save_to_chroma(chunks):
     db = Chroma.from_documents(
         chunks, OllamaEmbeddings(model="nomic-embed-text",), persist_directory=CHROMA_PATH
     )
+
+    retriever = db.as_retriever(search_kwargs={"k": 10})
     print(f"Saved {len(chunks)} chunks to {CHROMA_PATH}.")
 
 def generate_data_store():

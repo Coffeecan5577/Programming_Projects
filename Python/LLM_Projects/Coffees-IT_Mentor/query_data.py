@@ -1,12 +1,12 @@
 import argparse
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain.prompts import ChatPromptTemplate
 # from langchain.community.llms.ollama import Ollama
-from langchain_ollama import Ollama
+from langchain_ollama import OllamaLLM
 
 from get_embedding_function import get_embedding_function
 
-CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/Chroma_Training_Database"
+CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
 
 PROMPT_TEMPLATE = """
 Answer the question based only on the following context:
@@ -36,14 +36,14 @@ def query_rag(query_text: str):
     db = Chroma(persist_directory=CHROMA_PATH, embedding_function=embedding_function)
 
     # Search the DB.
-    results = db.similarity_search_with_score(query_text, k=5)
+    results = db.similarity_search_with_score(query_text, k=3)
 
     context_text = "\n\n---\n\n".join([doc.page_content for doc, _score in results])
     prompt_template = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
     prompt = prompt_template.format(context=context_text, question=query_text)
-    # print(prompt)
+    print(prompt)
 
-    model = Ollama(model="llama3.2")
+    model = OllamaLLM(model="llama3.2")
     response_text = model.invoke(prompt)
 
     sources = [doc.metadata.get("id", None) for doc, _score in results]
