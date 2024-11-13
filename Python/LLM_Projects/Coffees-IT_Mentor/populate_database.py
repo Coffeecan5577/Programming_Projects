@@ -31,15 +31,17 @@ def main():
 
 def load_documents():
     document_loader = DirectoryLoader(DATA_PATH)
-    return document_loader.load()
+    return document_loader.lazy_load()
 
 
 def split_documents(documents: list[Document]):
     text_splitter = RecursiveCharacterTextSplitter(
+        separators=["\n\n", "\n"],
         chunk_size=300,
-        chunk_overlap=10,
+        chunk_overlap=5,
         length_function=len,
         is_separator_regex=False,
+        add_start_index=False,
     )
     return text_splitter.split_documents(documents)
 

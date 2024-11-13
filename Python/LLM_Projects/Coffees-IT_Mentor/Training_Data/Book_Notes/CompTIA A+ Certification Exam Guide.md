@@ -50,10 +50,10 @@ Date Completed:
 	4. Expectations and Follow-Up:
 		1. Timeline - Try to establish a clear timeline of repairs to the customer and do your best to always stay in communication with them about the repairs themselves.
 		2. Options - Offer repair/replacement options as needed and let the customer decide on which route they want to take.
-		3. Documentation - At the completion of your work, provide proper documentation of services performed. 
+		3. Documentation - At the completion of your work, provide proper documentation of services performed.
 4. Be Prepared! - This section will cover how to handle computing devices like a professional:
 	1. Electrostatic Discharge:
-		1. Antistatic tools - The key to avoiding ESD is to keep yourself and the computer you are working on grounded at the same level of potential electric energy. You can accomplish this by using an ESD strap that connects to the computer on one end, and to your bare wrist on the other end. You can also use antistatic mats that contain resistors to help ground the PC you are working on, along with antistatic bags (Make sure to store PC components inside the bag, and not on it.) **Exam Tip** - *Always disconnect power before repairing a computing device.* 
+		1. Antistatic tools - The key to avoiding ESD is to keep yourself and the computer you are working on grounded at the same level of potential electric energy. You can accomplish this by using an ESD strap that connects to the computer on one end, and to your bare wrist on the other end. You can also use antistatic mats that contain resistors to help ground the PC you are working on, along with antistatic bags (Make sure to store PC components inside the bag, and not on it.) **Exam Tip** - *Always disconnect power before repairing a computing device.*
 
 **Troubleshooting Methodology**
 An effective troubleshooting methodology includes:
@@ -167,3 +167,5 @@ Developing a professional mindset involves balancing technical expertise with in
 ### Final Thoughts
 
 ---
+
+So what would happen if I were to add some extra data to the end of this file? Would my database update and repopulate the chunks accordingly? Let's find out!

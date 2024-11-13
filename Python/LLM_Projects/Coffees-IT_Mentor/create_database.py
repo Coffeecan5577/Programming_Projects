@@ -3,7 +3,18 @@ import os
 import shutil
 import logging
 import tqdm
+# Packages needed for image recognition and parsing are commented below
+'''
+import pytesseract
+import scipy
+import layoutparser
+import layoutparser.ocr as ocr
+import torch
+import matplotlib
+'''
+
 from langchain_community.document_loaders import DirectoryLoader
+from langchain_community.document_loaders.image import UnstructuredImageLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings
@@ -33,11 +44,23 @@ def print_directory(DATA_PATH):
 def load_documents():
     try:
         logger.info("Loading documents from %s", DATA_PATH)
-        loader = DirectoryLoader(DATA_PATH, glob="**/[!.]*", show_progress=True, use_multithreading=True, recursive=True, exclude="**/[/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.obsidian, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.trash ]*", )
-        documents = loader.load()
+
+        # Initialize our directory loader for markdown and PDF files
+        directory_loader = DirectoryLoader(DATA_PATH, glob="**/[!.]*", show_progress=True, use_multithreading=True, recursive=True, exclude="**/[/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.obsidian, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.trash ]*", )
+        documents = directory_loader.load()
         logger.info("Loaded %d documents:", len(documents))
         # print_documents(DATA_PATH)  # <--- Add this line
         return documents
+
+        '''
+        # Next, initialize our unstructured Image Loader for image files
+        image_loader = UnstructuredImageLoader(DATA_PATH, mode="single")
+        images = image_loader.load()
+        logger.info("Loaded %d images:", len(images))
+        # print_documents(DATA_PATH)  # <--- Add this line
+        return images
+        '''
+
     except Exception as e:
         logger.error(f"Failed to load documents: {e}")
         raise
@@ -59,7 +82,7 @@ def split_text(documents):
         text_splitter = RecursiveCharacterTextSplitter(
             separators=["\n\n", "\n"],
             chunk_size=300,
-            chunk_overlap=10,  # Reduced overlap to make more efficient splits
+            chunk_overlap=5,  # Reduced overlap to make more efficient splits
             length_function=len,
             add_start_index=False,
         )
@@ -69,7 +92,7 @@ def split_text(documents):
         if len(chunks) < 10:
             logger.warning("Not enough chunks to display metadata.")
         else:
-            document = chunks[100]
+            document = chunks[1]
             logger.info("Displaying metadata of the first chunk")
             logger.info(document.page_content)
             logger.info(document.metadata)
