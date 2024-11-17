@@ -3,33 +3,27 @@ import os
 import shutil
 import logging
 import tqdm
-# Packages needed for image recognition and parsing are commented below
-'''
-import pytesseract
-import scipy
-import layoutparser
-import layoutparser.ocr as ocr
-import torch
-import matplotlib
-'''
-
+import docling
 from langchain_community.document_loaders import DirectoryLoader
-from langchain_community.document_loaders.image import UnstructuredImageLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
-
+from docling.document_converter import DocumentConverter
+from docling.datamodel.document import ConversionResult
+from docling_core.transforms.chunker import HierarchicalChunker
+from docling_core.types import DoclingDocument
 
 # Define constants for paths
 CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
-DATA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Training_Data/"
+DATA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Training_Data"
 # OBSIDIAN_META_EXCLUSION_PATH = "/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta"
 
 # Initialize logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+'''
 def print_directory(DATA_PATH):
     logger.info("Printing documents in directory:")
     for filename in os.listdir(path):
@@ -40,16 +34,16 @@ def print_directory(DATA_PATH):
                 # print the contents of the file (you can use a debugger or inspect tool for this)
         except Exception as e:
             logger.error(f"Error reading file {filename}: {e}")
+'''
 
 def load_documents():
     try:
         logger.info("Loading documents from %s", DATA_PATH)
 
         # Initialize our directory loader for markdown and PDF files
-        directory_loader = DirectoryLoader(DATA_PATH, glob="**/[!.]*", show_progress=True, use_multithreading=True, recursive=True, exclude="**/[/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.obsidian, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.trash ]*", )
+        directory_loader = DirectoryLoader(DATA_PATH, glob="**/[!.]*", show_progress=True, use_multithreading=True, recursive=False, exclude="**/[/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.obsidian, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.trash ]*", )
         documents = directory_loader.load()
         logger.info("Loaded %d documents:", len(documents))
-        # print_documents(DATA_PATH)  # <--- Add this line
         return documents
 
         '''
@@ -65,17 +59,44 @@ def load_documents():
         logger.error(f"Failed to load documents: {e}")
         raise
 
+'''
 def validate_input_documents(documents):
     try:
         logger.info("Validating input documents")
+
         if not all(isinstance(document, Document) for document in documents):
             logger.error("Invalid document format. Only .md and .pdf files are supported.")
             return None
+
+        logger.info("Validating documents...")
         return documents
     except Exception as e:
         logger.error(f"Failed to validate input documents: {e}")
         raise
+'''
 
+def convert_docs(documents):
+    try:
+        # logger.info("Converting loaded documents into Markdown")
+        print(type(documents))
+        doc_converter = DocumentConverter()
+        conv_result = ConversionResult()
+        results = doc_converter.convert_all(documents)
+        conv_result.document.export_to_dict(results)
+        print(type(conv_result))
+        print(type(results))
+        return results
+
+        # logger.info(f"Converted {sum(results)} documents into markdown.")
+        # chunks = list(HierarchicalChunker().chunk(results))
+        # logger.info(f"Split {sum(input_files)} documents into {sum(chunks)} chunks.")
+        # return results
+    except Exception as e:
+        error_message = f"Failed to split text: {e}. Please check the documents or the splitting strategy."
+        logger.error(error_message)
+        raise ValueError(error_message)
+
+'''
 def split_text(documents):
     try:
         logger.info("Splitting text into chunks")
@@ -86,7 +107,10 @@ def split_text(documents):
             length_function=len,
             add_start_index=False,
         )
-        chunks = text_splitter.split_documents(documents)
+        # chunks = text_splitter.split_documents(documents)
+        # logger.info(f"Split {len(documents)} documents into {len(chunks)} chunks.")
+
+        chunks = list(HierarchicalChunker().chunk(documents))
         logger.info(f"Split {len(documents)} documents into {len(chunks)} chunks.")
 
         if len(chunks) < 10:
@@ -102,6 +126,7 @@ def split_text(documents):
         error_message = f"Failed to split text: {e}. Please check the documents or the splitting strategy."
         logger.error(error_message)
         raise ValueError(error_message)
+'''
 
 def save_to_chroma(chunks):
     logger.info("Saving documents to Chroma database at %s", CHROMA_PATH)
@@ -121,12 +146,13 @@ def generate_data_store():
         documents = load_documents()
         if documents is None:
             return
-
-        documents = validate_input_documents(documents)
+        '''
+        validate_input_documents(documents)
         if documents is None:
             return
+        '''
 
-        chunks = split_text(documents)
+        chunks = convert_docs(documents)
         save_to_chroma(chunks)
     except Exception as e:
         logger.error(f"Failed to generate data store: {e}")
