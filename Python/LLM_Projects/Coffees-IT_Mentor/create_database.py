@@ -10,9 +10,11 @@ from langchain_core.documents import Document
 from langchain_ollama import OllamaEmbeddings
 from langchain_chroma import Chroma
 from docling.document_converter import DocumentConverter
-from docling.datamodel.document import ConversionResult
-from docling_core.transforms.chunker import HierarchicalChunker
-from docling_core.types import DoclingDocument
+from docling.datamodel.document import ConversionResult, InputDocument
+# from docling_core.transforms.chunker import HierarchicalChunker
+# from docling_core.types import DoclingDocument
+from docling_core.transforms.chunker.hierarchical_chunker import HierarchicalChunker
+from docling_core.types.doc.document import DoclingDocument
 
 # Define constants for paths
 CHROMA_PATH = "/home/coffeecan/Git-Repos/Programming_Projects/Python/LLM_Projects/Coffees-IT_Mentor/Chroma_Training_Database"
@@ -44,20 +46,40 @@ def load_documents():
         directory_loader = DirectoryLoader(DATA_PATH, glob="**/[!.]*", show_progress=True, use_multithreading=True, recursive=False, exclude="**/[/home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/99 - Meta, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.obsidian, /home/coffeecan/Git-Repos/Coffees-Obsidian-Vaults/Coffee's Vault/.trash ]*", )
         documents = directory_loader.load()
         logger.info("Loaded %d documents:", len(documents))
-        return documents
+        print(type(documents))
+        # return documents
 
-        '''
-        # Next, initialize our unstructured Image Loader for image files
-        image_loader = UnstructuredImageLoader(DATA_PATH, mode="single")
-        images = image_loader.load()
-        logger.info("Loaded %d images:", len(images))
-        # print_documents(DATA_PATH)  # <--- Add this line
-        return images
-        '''
+        # Convert the list of documents to a dictionary
+
+        doc_dict = {}
+        for document in documents:
+            key = get_unique_key(document)  # Define this function to extract a unique key from each document
+            if key is not None:
+                doc_dict[key] = document
+        # print(type(doc_dict))
+        return doc_dict
+
 
     except Exception as e:
         logger.error(f"Failed to load documents: {e}")
-        raise
+    raise
+
+    '''
+    # Next, initialize our unstructured Image Loader for image files
+    image_loader = UnstructuredImageLoader(DATA_PATH, mode="single")
+    images = image_loader.load()
+    logger.info("Loaded %d images:", len(images))
+    # print_documents(DATA_PATH)  # <--- Add this line
+    return images
+    '''
+
+def get_unique_key(document):
+    if isinstance(document, Document):  # Assuming the unique identifier is stored as a string in the documents
+        return os.path.basename(document.metadata['source']).split('.')[0]
+    else:
+        print(f"Unexpected type: {type(document)}")  # Add this line to debug
+        return None
+
 
 '''
 def validate_input_documents(documents):
@@ -73,18 +95,29 @@ def validate_input_documents(documents):
     except Exception as e:
         logger.error(f"Failed to validate input documents: {e}")
         raise
+
 '''
 
 def convert_docs(documents):
     try:
         # logger.info("Converting loaded documents into Markdown")
-        print(type(documents))
+        print(type(documents))  # Print the type and content of documents for debugging
+
+        if not isinstance(documents, InputDocument):
+            raise ValueError("Input must be a dictionary of documents.")
+
         doc_converter = DocumentConverter()
-        conv_result = ConversionResult()
-        results = doc_converter.convert_all(documents)
-        conv_result.document.export_to_dict(results)
-        print(type(conv_result))
-        print(type(results))
+        conv_result = ConversionResult(input=documents)  # Assuming input should be a list
+        dict_repr = conv_result.document.export_to_dict()
+        results = doc_converter.convert_all(dict_repr)
+
+        print(type(results))  # Print the type of results for debugging
+        print(type(conv_result))  # Print the type of conv_result for debugging
+        print(type(dict_repr))  # Print the type of dict_repr for debugging
+
+        if not isinstance(results, list):
+            raise ValueError("Conversion result must be a list of markdown content.")
+
         return results
 
         # logger.info(f"Converted {sum(results)} documents into markdown.")
@@ -92,7 +125,7 @@ def convert_docs(documents):
         # logger.info(f"Split {sum(input_files)} documents into {sum(chunks)} chunks.")
         # return results
     except Exception as e:
-        error_message = f"Failed to split text: {e}. Please check the documents or the splitting strategy."
+        error_message = f"Failed to convert documents: {e}. Please check the documents or the conversion strategy."
         logger.error(error_message)
         raise ValueError(error_message)
 
@@ -146,6 +179,7 @@ def generate_data_store():
         documents = load_documents()
         if documents is None:
             return
+
         '''
         validate_input_documents(documents)
         if documents is None:
