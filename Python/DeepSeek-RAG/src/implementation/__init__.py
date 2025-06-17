@@ -1,4 +1,4 @@
-from .datastore import datastore
+from .datastore import Datastore
 from .evaluator import Evaluator
 from .indexer import Indexer
 from .response_generator import ResponseGenerator

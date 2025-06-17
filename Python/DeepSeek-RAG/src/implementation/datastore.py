@@ -1,9 +1,8 @@
 from typing import List
 from interface.base_datastore import BaseDatastore, DataItem
 import lancedb
-from lancedb.table import table
+from lancedb.table import Table
 import pyarrow as pa
-# from ollama import ollama
 from concurrent.futures import ThreadPoolExecutor
 
 

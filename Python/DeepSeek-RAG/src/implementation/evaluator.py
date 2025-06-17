@@ -27,7 +27,9 @@ class Evaluator(BaseEvaluator):
         """
 
         response_content = invoke_ai(
-            system_message=SYSTEM_PROMPT, user_message=user_prompt
+            None,
+            None,
+            system_message=SYSTEM_PROMPT, user_message=user_prompt,
         )
 
         reasoning = extract_xml_tag(response_content, "reasoning")
